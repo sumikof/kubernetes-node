@@ -1,0 +1,6 @@
+master_node_ip: 192.168.1.4
+master_node_name: master
+file_mountpoint: /etc/kubernetes/serviceaccount.key
+etcd_config: /atomic.io/network/config
+kubectl_admin_name: admin
+kubectl_admin_pass: admin

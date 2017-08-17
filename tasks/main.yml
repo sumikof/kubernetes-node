@@ -1,0 +1,54 @@
+---
+- name: install packages docker
+  yum: name={{ item }} state=present
+  with_items:
+    - kubernetes
+    - docker
+    - flannel
+
+- name: edit /etc/sysconfig/flanneld
+  lineinfile: >-
+    dest='/etc/sysconfig/flanneld'
+    state=present
+    backrefs=yes
+    regexp='{{ item.regexp }}'
+    line='{{ item.line }}'
+  with_items:
+    - regexp: 'FLANNEL_ETCD_ENDPOINTS='
+      line: 'FLANNEL_ETCD_ENDPOINTS="http://{{ master_node_name }}:2379"'
+
+- name: restart service
+  service: name={{ item }} state=restarted enabled=yes
+  with_items:
+    - flanneld
+    - docker
+
+
+- name: edit /etc/kubernetes/config
+  lineinfile: >-
+    dest='/etc/kubernetes/config'
+    state=present
+    backrefs=yes
+    regexp='KUBE_MASTER='
+    line='KUBE_MASTER="--master=http://{{ master_node_ip }}:8080"'
+
+- name: edit /etc/kubernetes/kubelet
+  lineinfile: >-
+    dest='/etc/kubernetes/kubelet'
+    state=present
+    backrefs=yes
+    regexp='{{ item.regexp }}'
+    line='{{ item.line }}'
+  with_items:
+    - regexp: 'KUBELET_HOSTNAME='
+      line: 'KUBELET_HOSTNAME="--hostname-override="'
+    - regexp: 'KUBELET_API_SERVER='
+      line: 'KUBELET_API_SERVER="--api-servers=http://{{ master_node_ip }}:8080"'
+    - regexp: 'KUBELET_ADDRESS='
+      line: 'KUBELET_ADDRESS="--address=192.168.1.14"'
+
+- name: restart service
+  service: name={{ item }} state=restarted enabled=yes
+  with_items:
+    - kube-proxy
+    - kubelet
