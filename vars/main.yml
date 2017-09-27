@@ -1,6 +1,8 @@
-master_node_ip: 192.168.1.4
-master_node_name: master
+master_node_ip: 192.168.1.8
+master_node_name: kuber-master
 file_mountpoint: /etc/kubernetes/serviceaccount.key
 etcd_config: /atomic.io/network/config
 kubectl_admin_name: admin
 kubectl_admin_pass: admin
+kuber_node_ip: 192.168.1.9
+kuber_node_name: kuber-node-01
